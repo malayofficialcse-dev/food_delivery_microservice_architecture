@@ -1,0 +1,50 @@
+// import dotenv from "dotenv";
+
+// dotenv.config();
+
+// export const env = {
+
+//     PORT: process.env.PORT || 5001,
+
+//     DB_HOST: process.env.DB_HOST!,
+
+//     DB_PORT: Number(process.env.DB_PORT),
+
+//     DB_NAME: process.env.DB_NAME!,
+
+//     DB_USER: process.env.DB_USER!,
+
+//     DB_PASSWORD: process.env.DB_PASSWORD!,
+
+//     JWT_SECRET: process.env.JWT_SECRET!,
+
+//     JWT_EXPIRES: process.env.JWT_EXPIRES!
+
+// };
+
+
+import dotenv from "dotenv";
+
+dotenv.config();
+
+export const env = {
+    PORT: Number(process.env.PORT) || 5001,
+
+    NODE_ENV: process.env.NODE_ENV || "development",
+
+    DB_HOST: process.env.DB_HOST || "localhost",
+
+    DB_PORT: Number(process.env.DB_PORT) || 5432,
+
+    DB_NAME: process.env.DB_NAME || "food_delivery_auth",
+
+    DB_USER: process.env.DB_USER || "postgres",
+
+    DB_PASSWORD: process.env.DB_PASSWORD || "postgres",
+
+    JWT_SECRET: process.env.JWT_SECRET || "food-delivery-secret",
+
+    JWT_EXPIRES: process.env.JWT_EXPIRES || "1d",
+
+    BCRYPT_ROUNDS: Number(process.env.BCRYPT_ROUNDS) || 10,
+};
