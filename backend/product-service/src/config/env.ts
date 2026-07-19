@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const ENV = {
-    PORT: Number(process.env.PORT) || 5002,
+    PORT: Number(process.env.PORT) || 5003,
 
     MONGO_URI:
         process.env.MONGO_URI ||
