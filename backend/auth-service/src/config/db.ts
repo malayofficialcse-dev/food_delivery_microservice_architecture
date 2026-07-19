@@ -34,7 +34,7 @@ export const pool = new Pool({
 });
 
 pool.on("connect", () => {
-    console.log("✅ PostgreSQL Connected");
+    console.log("✅ PostgreSQL Connected for auth service");
 });
 
 pool.on("error", (err: Error) => {
