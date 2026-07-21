@@ -13,7 +13,7 @@ export enum NotificationStatus {
   FAILED = "FAILED",
 }
 
-export interface Inotification extends Document {
+export interface INotification extends Document {
     userId:string;
     type:NotificationType;
     title:string;
