@@ -23,4 +23,6 @@ export const env = {
     JWT_EXPIRES: process.env.JWT_EXPIRES || "1d",
 
     BCRYPT_ROUNDS: Number(process.env.BCRYPT_ROUNDS) || 10,
+    KAFKA_BROKER: process.env.KAFKA_BROKER || "",
+    KAFKA_CLIENT_ID: process.env.KAFKA_CLIENT_ID || "order-service",
 };

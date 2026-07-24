@@ -1,7 +1,8 @@
 import app from "./app";
 import {connectDB} from "./config/db";
+import { env } from "./config/env";
 
-const PORT = process.env.PORT || 5003;
+const PORT = env.PORT;
 
 const startServer = async () => {
     try {

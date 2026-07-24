@@ -1,0 +1,23 @@
+import { v4 as uuidv4 } from "uuid";
+import * as repository from "../repositories/index.repository";
+import { getProduct } from "./product.service";
+import { ensureRestaurantExists } from "./restaurant.service";
+import { createPayment } from "./payment.service";
+import { publishOrderEvent } from "./kafka.producer";
+import type { CreateOrderInput, Order, UpdateOrderInput } from "../interfaces/index.interface";
+export const createOrder = async (input:CreateOrderInput):Promise<Order> => {
+  if(!input.items.length) throw new Error("An order must contain at least one item");
+  await ensureRestaurantExists(input.restaurantId);
+  const products=await Promise.all(input.items.map(item=>getProduct(item.productId)));
+  if(products.some(product=>product.sellerId && product.sellerId !== input.restaurantId)) throw new Error("All products must belong to the selected restaurant");
+  const items=products.map((product,index)=>({productId:product.id,productName:product.productName,productImage:product.image,quantity:input.items[index].quantity,price:product.price}));
+  const totalAmount=items.reduce((sum,item)=>sum+item.price*item.quantity,0);
+  const order=await repository.createOrder({...input,orderNumber:`FD-${Date.now()}-${uuidv4().slice(0,8).toUpperCase()}`,items,totalAmount,paymentStatus:"Pending",orderStatus:"Pending"});
+  const paymentStatus=await createPayment({orderId:order.id!,amount:totalAmount,method:input.paymentMethod});
+  const updated=paymentStatus === "Pending" ? order : (await repository.updateOrder(order.id!,{paymentStatus})) || order;
+  await publishOrderEvent("order.created",updated); return updated;
+};
+export const getOrders=(userId?:string)=>repository.getOrders(userId);
+export const getOrder=async(id:string)=>{const order=await repository.getOrderById(id);if(!order)throw new Error("Order not found");return order;};
+export const updateOrder=async(id:string,input:UpdateOrderInput)=>{const order=await getOrder(id);if(order.orderStatus === "Cancelled" || order.orderStatus === "Delivered")throw new Error("Order can no longer be updated");const updated=await repository.updateOrder(id,input);if(!updated)throw new Error("Order not found");await publishOrderEvent("order.updated",updated);return updated;};
+export const cancelOrder=(id:string)=>updateOrder(id,{orderStatus:"Cancelled"});

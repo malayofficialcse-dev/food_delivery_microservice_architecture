@@ -5,7 +5,6 @@ import morgan from "morgan";
 import dotenv from "dotenv";
 
 import orderRoutes from "./routes/index.routes";
-import { success } from "zod";
 
 dotenv.config();
 

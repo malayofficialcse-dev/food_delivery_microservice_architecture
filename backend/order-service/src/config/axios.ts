@@ -5,7 +5,7 @@ dotenv.config();
 
 // /Auth Service Instance
 export const authService = axios.create({
-    baseURL:process.env.AUTH_SERVICE_URL,
+    baseURL:process.env.AUTH_SERVICE_URL || "http://localhost:4000/api",
     timeout:5000,
     headers:{
         "Content-Type":"application/json"
@@ -14,12 +14,14 @@ export const authService = axios.create({
 
 //Product service instance
 export const productService  = axios.create({
-    baseURL:process.env.PRODUCT_SERVICE_URL,
+    baseURL:process.env.PRODUCT_SERVICE_URL || "http://localhost:4003/api",
     timeout:5000,
     headers:{
         "Content-Type":"application/json"
     }
 });
+
+export const restaurantService = axios.create({ baseURL: process.env.RESTAURANT_SERVICE_URL || "http://localhost:4002/api", timeout: 5000, headers: { "Content-Type": "application/json" } });
 
 //payment service instance
 export const paymentService = axios.create({
@@ -45,6 +47,7 @@ const attachAuthToken = (config:any) => {
 
 authService.interceptors.request.use(attachAuthToken);
 productService.interceptors.request.use(attachAuthToken);
+restaurantService.interceptors.request.use(attachAuthToken);
 paymentService.interceptors.request.use(attachAuthToken);
 
 /**
@@ -79,3 +82,4 @@ paymentService.interceptors.response.use(
   (response) => response,
   handleError
 );
+restaurantService.interceptors.response.use((response) => response, handleError);

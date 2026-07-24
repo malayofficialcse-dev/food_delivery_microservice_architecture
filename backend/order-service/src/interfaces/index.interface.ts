@@ -35,6 +35,7 @@ export interface Order {
     id?:string;
     orderNumber:string;
     userId:string;
+    restaurantId:string;
     items:OrderItem[];
     totalAmount:number;
     shippingAddress:ShippingAddress;
@@ -43,5 +44,20 @@ export interface Order {
     orderStatus:OrderStatus;
     createdAt?:Date;
     updatedAt?:Date;
+}
+
+export interface CreateOrderInput {
+    userId: string;
+    restaurantId: string;
+    items: Array<{ productId: string; quantity: number }>;
+    shippingAddress: ShippingAddress;
+    paymentMethod: string;
+}
+
+export interface UpdateOrderInput {
+    shippingAddress?: ShippingAddress;
+    paymentMethod?: string;
+    orderStatus?: OrderStatus;
+    paymentStatus?: PaymentStatus;
 }
 
