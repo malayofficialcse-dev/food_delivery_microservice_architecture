@@ -1,52 +1,79 @@
-import { Bike, CheckCircle2, ChefHat, Home, PackageCheck } from 'lucide-react';
+import { Bike, CheckCircle2, ChefHat, Home, MapPin, PackageCheck, Receipt, Sparkles } from 'lucide-react';
 import { currency, orders } from '../data/appData';
 
 export function OrderDetailPage({ orderId }: { orderId: string }) {
   const order = orders.find((item) => item.id === orderId) ?? orders[0];
   const steps = [
-    { label: 'Confirmed', icon: CheckCircle2 },
-    { label: 'Preparing', icon: ChefHat },
-    { label: 'On the way', icon: Bike },
-    { label: 'Delivered', icon: Home },
+    { label: 'Order Confirmed', desc: 'Kitchen accepted', icon: CheckCircle2 },
+    { label: 'Preparing', desc: 'Chefs are cooking', icon: ChefHat },
+    { label: 'On The Way', desc: 'Rider picked up', icon: Bike },
+    { label: 'Delivered', desc: 'Enjoy your meal!', icon: Home },
   ];
 
+  const currentStepIndex = Math.floor(order.progress / 34);
+
   return (
-    <section className="page-stack">
-      <div className="tracking-hero">
-        <div>
-          <span className="section-kicker">Tracking #{order.id}</span>
-          <h1>{order.status === 'Delivered' ? 'Order delivered' : `Arriving in ${order.eta}`}</h1>
-          <p>{order.restaurant} is handling your order. You will receive live status updates here.</p>
+    <div className="order-detail-root">
+      {/* Tracking Hero Banner */}
+      <section className="tracking-hero-premium">
+        <div className="hero-left">
+          <span className="tracking-badge">
+            <Sparkles size={14} /> LIVE TRACKING
+          </span>
+          <h1>{order.status === 'Delivered' ? 'Order Completed' : `Arriving in ${order.eta}`}</h1>
+          <p className="sub">#{order.id} from <strong>{order.restaurant}</strong> is being prepared with priority care.</p>
         </div>
-        <strong>{currency.format(order.total)}</strong>
-      </div>
-      <div className="tracking-card">
-        <div className="progress-track large"><span style={{ width: `${order.progress}%` }} /></div>
-        <div className="tracking-steps">
-          {steps.map(({ label, icon: Icon }, index) => (
-            <article className={index <= Math.floor(order.progress / 34) ? 'active' : ''} key={label}>
-              <Icon size={20} />
-              <span>{label}</span>
-            </article>
-          ))}
+        <div className="hero-right">
+          <span className="price-tag">{currency.format(order.total)}</span>
         </div>
-      </div>
-      <div className="panel">
-        <div className="panel-heading compact">
-          <div>
-            <span className="section-kicker">Items</span>
-            <h2>Order contents</h2>
+      </section>
+
+      {/* Map or Delivery Progress Section */}
+      <div className="tracking-content-grid">
+        {/* Progress card */}
+        <div className="progress-card-premium">
+          <div className="progress-bar-container">
+            <div className="progress-bar-fill" style={{ width: `${order.progress}%` }} />
+          </div>
+
+          <div className="timeline-steps">
+            {steps.map(({ label, desc, icon: Icon }, index) => {
+              const isActive = index <= currentStepIndex;
+              const isCurrent = index === currentStepIndex;
+              return (
+                <div key={label} className={`timeline-step-col ${isActive ? 'active' : ''} ${isCurrent ? 'current' : ''}`}>
+                  <div className="step-icon-wrap">
+                    <Icon size={20} />
+                  </div>
+                  <strong className="step-label">{label}</strong>
+                  <span className="step-desc">{desc}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
-        <div className="timeline">
-          {order.items.map((item) => (
-            <div className="timeline-item" key={item}>
-              <PackageCheck size={16} />
-              <p>{item}</p>
+
+        {/* Address and contents card */}
+        <div className="order-summary-panel-premium">
+          <div className="summary-section">
+            <h3><MapPin size={17} /> Delivery Address</h3>
+            <p>221B Azure Avenue, Sector 7, Tower B, Floor 12</p>
+          </div>
+
+          <div className="summary-section">
+            <h3><PackageCheck size={17} /> Order Contents</h3>
+            <div className="order-items-detail-list">
+              {order.items.map((item) => (
+                <div className="detail-item-line" key={item}>
+                  <Receipt size={14} />
+                  <span>{item}</span>
+                  <strong className="qty-tag">x1</strong>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

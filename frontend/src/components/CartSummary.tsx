@@ -18,25 +18,48 @@ export function CartSummary({ cart, buttonLabel, onNavigate, target }: CartSumma
   const total = subtotal + delivery + taxes - discount;
 
   return (
-    <aside className="summary-panel">
-      <div className="panel-heading compact">
-        <div>
-          <span className="section-kicker">Order summary</span>
-          <h2>Payment total</h2>
-        </div>
+    <aside className="summary-panel-premium">
+      <div className="panel-heading">
+        <span className="section-kicker">Summary</span>
+        <h2>Order Bill</h2>
       </div>
+
       <div className="summary-lines">
-        <span>Subtotal <strong>{currency.format(subtotal)}</strong></span>
-        <span>Delivery <strong>{currency.format(delivery)}</strong></span>
-        <span>Taxes <strong>{currency.format(taxes)}</strong></span>
-        <span className="saving"><BadgePercent size={15} /> Promo saving <strong>-{currency.format(discount)}</strong></span>
+        <div className="summary-line">
+          <span>Subtotal</span>
+          <strong>{currency.format(subtotal)}</strong>
+        </div>
+        <div className="summary-line">
+          <span>Delivery fee</span>
+          <strong>{currency.format(delivery)}</strong>
+        </div>
+        <div className="summary-line">
+          <span>Taxes (8%)</span>
+          <strong>{currency.format(taxes)}</strong>
+        </div>
+        {discount > 0 && (
+          <div className="summary-line discount-line">
+            <span className="saving">
+              <BadgePercent size={15} /> Promo discount
+            </span>
+            <strong className="saving">-{currency.format(discount)}</strong>
+          </div>
+        )}
       </div>
+
       <div className="summary-total">
-        <span>Total</span>
+        <span>To Pay</span>
         <strong>{currency.format(total)}</strong>
       </div>
-      <button className="primary-button full-button" type="button" disabled={!cart.length} onClick={() => onNavigate(target)}>
-        {buttonLabel} <ArrowRight size={17} />
+
+      <button
+        className="summary-pay-btn"
+        type="button"
+        disabled={!cart.length}
+        onClick={() => onNavigate(target)}
+      >
+        {buttonLabel}
+        <ArrowRight size={17} />
       </button>
     </aside>
   );
