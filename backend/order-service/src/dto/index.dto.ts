@@ -4,7 +4,7 @@ const orderStatuses = ["Pending", "Confirmed", "Processing", "Packed", "Shipped"
 const paymentStatuses = ["Pending", "Paid", "Failed", "Refunded"] as const;
 
 export const createOrderSchema = z.object({
-  userId: z.string().uuid(), restaurantId: z.string().uuid(),
+  userId: z.string().uuid().optional(), restaurantId: z.string().uuid(),
   items: z.array(z.object({ productId: z.string().min(1), quantity: z.number().int().positive() })).min(1),
   shippingAddress: z.object({ fullName:z.string().min(1), phone:z.string().min(5), address:z.string().min(1), city:z.string().min(1), state:z.string().min(1), pinCode:z.string().min(3) }),
   paymentMethod: z.string().min(1),

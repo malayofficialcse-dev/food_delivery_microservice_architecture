@@ -5,6 +5,7 @@ import morgan from "morgan";
 import dotenv from "dotenv";
 
 import orderRoutes from "./routes/index.routes";
+import { errorHandler } from "./middleware/error.middleware";
 
 dotenv.config();
 
@@ -26,5 +27,6 @@ app.get("/",(_,res) => {
 });
 
 app.use("/api/orders",orderRoutes);
+app.use(errorHandler);
 
 export default app;

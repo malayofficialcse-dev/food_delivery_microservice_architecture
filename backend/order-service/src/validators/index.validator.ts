@@ -1,0 +1,3 @@
+import { z } from "zod";
+export const createOrderValidator = z.object({ userId:z.string().uuid().optional(), restaurantId:z.string().uuid(), items:z.array(z.object({productId:z.string().min(1),quantity:z.number().int().positive()})).min(1), shippingAddress:z.object({fullName:z.string().min(1),phone:z.string().min(5),address:z.string().min(1),city:z.string().min(1),state:z.string().min(1),pinCode:z.string().min(3)}), paymentMethod:z.string().min(1) });
+export const updateOrderValidator = z.object({ shippingAddress:createOrderValidator.shape.shippingAddress.optional(), paymentMethod:z.string().min(1).optional(), orderStatus:z.string().optional(), paymentStatus:z.string().optional() }).strict();
