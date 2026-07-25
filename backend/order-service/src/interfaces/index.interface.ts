@@ -61,3 +61,5 @@ export interface UpdateOrderInput {
     paymentStatus?: PaymentStatus;
 }
 
+export interface AuthenticatedUser { id: string; role?: string; }
+

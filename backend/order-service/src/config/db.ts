@@ -1,5 +1,7 @@
 import {Pool} from "pg";
 import {env} from "./env";
+import { readFile } from "fs/promises";
+import path from "path";
 
 
 export const pool = new Pool(
@@ -27,6 +29,8 @@ pool.on("error",(err:Error) => {
 
 export const connectDB = async () => {
     try {
+        const schemaPath = path.resolve(process.cwd(), "src", "database", "schema.sql");
+        await pool.query(await readFile(schemaPath, "utf8"));
         await pool.query("SELECT NOW()");
         console.log("Order service connected successfully");
     } catch (error) {

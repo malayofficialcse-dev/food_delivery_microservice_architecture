@@ -25,4 +25,6 @@ export const env = {
     BCRYPT_ROUNDS: Number(process.env.BCRYPT_ROUNDS) || 10,
     KAFKA_BROKER: process.env.KAFKA_BROKER || "",
     KAFKA_CLIENT_ID: process.env.KAFKA_CLIENT_ID || "order-service",
+    KAFKA_GROUP_ID: process.env.KAFKA_GROUP_ID || "order-service-group",
+    KAFKA_PAYMENT_TOPIC: process.env.KAFKA_PAYMENT_TOPIC || "payment.events",
 };
