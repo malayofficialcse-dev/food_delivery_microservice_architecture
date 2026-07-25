@@ -1,8 +1,12 @@
+import dotenv from "dotenv";
+
+dotenv.config();
+
 import { Kafka, Producer, Consumer } from "kafkajs";
 
 const kafka = new Kafka({
     clientId: "notification-service",
-    brokers: [process.env.KAFKA_BROKER || "localhost:9092"],
+    brokers: (process.env.KAFKA_BROKER || "localhost:9092").split(","),
 });
 
 export const producer: Producer = kafka.producer();
@@ -36,17 +40,13 @@ export const connectConsumer = async (): Promise<void> => {
             "notification.send",
         ];
 
-        for(const topic of topics) {
-            await consumer.subscribe(
-                {
-                    topic,
-                    fromBeginning:false,
-                }
-            )
+        for (const topic of topics) {
+            await consumer.subscribe({ topic, fromBeginning: false });
         }
 
         console.log("Kafka connected successfully");
     } catch (error) {
+        console.error("Kafka consumer connection failed");
         console.error(error);
     }
-}
+};
