@@ -3,7 +3,9 @@ import type { CartLine, Product } from '../types';
 export function getCartSubtotal(cart: CartLine[], products: Product[]) {
   return cart.reduce((total, line) => {
     const product = products.find((item) => item.id === line.productId);
-    return total + (product?.price ?? 0) * line.quantity;
+    const basePrice = product?.price ?? 0;
+    const additionalPrice = line.priceAddition ?? 0;
+    return total + (basePrice + additionalPrice) * line.quantity;
   }, 0);
 }
 

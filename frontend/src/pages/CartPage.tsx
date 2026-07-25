@@ -5,8 +5,8 @@ import type { CartLine, Page } from '../types';
 
 type CartPageProps = {
   cart: CartLine[];
-  onAdd: (productId: string) => void;
-  onDecrease: (productId: string) => void;
+  onAdd: (productId: string, customizationText?: string, priceAddition?: number) => void;
+  onDecrease: (productId: string, customizationText?: string) => void;
   onNavigate: (page: Page) => void;
 };
 
@@ -36,23 +36,28 @@ export function CartPage({ cart, onAdd, onDecrease, onNavigate }: CartPageProps)
               {cart.map((line) => {
                 const product = products.find((p) => p.id === line.productId);
                 if (!product) return null;
+                const itemPrice = product.price + (line.priceAddition ?? 0);
+                const uniqueKey = `${line.productId}-${line.customizationText || ''}`;
                 return (
-                  <article className="cart-item-card" key={line.productId}>
+                  <article className="cart-item-card" key={uniqueKey}>
                     <img src={product.image} alt={product.name} className="cart-item-img" />
                     <div className="cart-item-info">
                       <strong className="cart-item-name">{product.name}</strong>
+                      {line.customizationText && (
+                        <span className="cart-item-custom-details">{line.customizationText}</span>
+                      )}
                       <span className="cart-item-cat">{product.category}</span>
-                      <span className="cart-item-unit">{currency.format(product.price)} each</span>
+                      <span className="cart-item-unit">{currency.format(itemPrice)} each</span>
                     </div>
                     <div className="cart-item-right">
                       <strong className="cart-item-total">
-                        {currency.format(product.price * line.quantity)}
+                        {currency.format(itemPrice * line.quantity)}
                       </strong>
                       <div className="cart-qty-ctrl">
                         <button
                           className="cart-qty-btn"
                           type="button"
-                          onClick={() => onDecrease(product.id)}
+                          onClick={() => onDecrease(line.productId, line.customizationText)}
                         >
                           {line.quantity === 1 ? <Trash2 size={14} /> : <Minus size={14} />}
                         </button>
@@ -60,7 +65,7 @@ export function CartPage({ cart, onAdd, onDecrease, onNavigate }: CartPageProps)
                         <button
                           className="cart-qty-btn"
                           type="button"
-                          onClick={() => onAdd(product.id)}
+                          onClick={() => onAdd(line.productId, line.customizationText, line.priceAddition)}
                         >
                           <Plus size={14} />
                         </button>

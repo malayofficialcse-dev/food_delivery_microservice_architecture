@@ -34,68 +34,115 @@ function App() {
     localStorage.setItem('food-ui-theme', theme);
   }, [theme]);
 
+  const [toast, setToast] = useState<{ message: string; id: number } | null>(null);
+
+  const triggerToast = (message: string) => {
+    const id = Date.now();
+    setToast({ message, id });
+    setTimeout(() => {
+      setToast((curr) => (curr?.id === id ? null : curr));
+    }, 3000);
+  };
+
   const navigate = (nextPage: Page) => {
     setPage(nextPage);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const addToCart = (productId: string) => {
+  const addToCart = (
+    productId: string,
+    customizationText?: string,
+    priceAddition?: number,
+    qtyToAdd: number = 1
+  ) => {
     setCart((current) => {
-      const existing = current.find((line) => line.productId === productId);
+      const existing = current.find(
+        (line) => line.productId === productId && line.customizationText === customizationText
+      );
       if (existing) {
-        return current.map((line) => line.productId === productId ? { ...line, quantity: line.quantity + 1 } : line);
+        return current.map((line) =>
+          line.productId === productId && line.customizationText === customizationText
+            ? { ...line, quantity: line.quantity + qtyToAdd }
+            : line
+        );
       }
-      return [...current, { productId, quantity: 1 }];
+      return [...current, { productId, quantity: qtyToAdd, customizationText, priceAddition }];
     });
+
+    // Trigger toast notification
+    const prod = products.find((p) => p.id === productId);
+    if (prod) {
+      const optionDetails = customizationText ? ` (${customizationText})` : '';
+      triggerToast(`Added ${qtyToAdd}x ${prod.name}${optionDetails} to cart!`);
+    }
   };
 
-  const decreaseCart = (productId: string) => {
-    setCart((current) => current.flatMap((line) => {
-      if (line.productId !== productId) return [line];
-      if (line.quantity <= 1) return [];
-      return [{ ...line, quantity: line.quantity - 1 }];
-    }));
+  const decreaseCart = (productId: string, customizationText?: string) => {
+    setCart((current) =>
+      current.flatMap((line) => {
+        if (line.productId !== productId || line.customizationText !== customizationText) return [line];
+        if (line.quantity <= 1) return [];
+        return [{ ...line, quantity: line.quantity - 1 }];
+      })
+    );
   };
 
   const productQuantity = page.name === 'product'
-    ? cart.find((line) => line.productId === page.productId)?.quantity ?? 0
+    ? cart.filter((line) => line.productId === page.productId).reduce((sum, line) => sum + line.quantity, 0)
     : 0;
 
   return (
-    <AppShell
-      activePage={page}
-      cartCount={getCartCount(cart)}
-      onNavigate={navigate}
-      onSearch={setSearchTerm}
-      onToggleTheme={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-      theme={theme}
-    >
-      {page.name === 'home' && <HomePage onAddToCart={addToCart} onNavigate={navigate} />}
-      {page.name === 'restaurants' && <RestaurantsPage onNavigate={navigate} />}
-      {page.name === 'restaurant' && (
-        <RestaurantDetailPage restaurantId={page.restaurantId} onAddToCart={addToCart} onNavigate={navigate} />
+    <>
+      <AppShell
+        activePage={page}
+        cartCount={getCartCount(cart)}
+        onNavigate={navigate}
+        onSearch={setSearchTerm}
+        onToggleTheme={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+        theme={theme}
+      >
+        {page.name === 'home' && <HomePage onAddToCart={addToCart} onNavigate={navigate} onSearch={setSearchTerm} />}
+        {page.name === 'restaurants' && <RestaurantsPage onNavigate={navigate} />}
+        {page.name === 'restaurant' && (
+          <RestaurantDetailPage restaurantId={page.restaurantId} onAddToCart={addToCart} onNavigate={navigate} />
+        )}
+        {page.name === 'products' && (
+          <ProductsPage searchTerm={searchTerm} onAddToCart={addToCart} onNavigate={navigate} />
+        )}
+        {page.name === 'product' && (
+          <ProductDetailPage
+            productId={page.productId}
+            quantity={productQuantity}
+            onAddToCart={addToCart}
+            onDecrease={decreaseCart}
+            onNavigate={navigate}
+          />
+        )}
+        {page.name === 'cart' && (
+          <CartPage
+            cart={cart}
+            onAdd={(id, custText, priceAdd) => addToCart(id, custText, priceAdd, 1)}
+            onDecrease={decreaseCart}
+            onNavigate={navigate}
+          />
+        )}
+        {page.name === 'checkout' && <CheckoutPage cart={cart} onNavigate={navigate} />}
+        {page.name === 'payment' && <PaymentPage cart={cart} onNavigate={navigate} />}
+        {page.name === 'orders' && <OrdersPage onNavigate={navigate} />}
+        {page.name === 'order' && <OrderDetailPage orderId={page.orderId} />}
+        {page.name === 'profile' && <ProfilePage />}
+        {page.name === 'login' && <LoginPage onNavigate={navigate} />}
+        {page.name === 'support' && <SupportPage />}
+      </AppShell>
+      {toast && (
+        <div className="toast-notification">
+          <div className="toast-content">
+            <span className="toast-icon">✨</span>
+            <span className="toast-message">{toast.message}</span>
+          </div>
+        </div>
       )}
-      {page.name === 'products' && (
-        <ProductsPage searchTerm={searchTerm} onAddToCart={addToCart} onNavigate={navigate} />
-      )}
-      {page.name === 'product' && (
-        <ProductDetailPage
-          productId={page.productId}
-          quantity={productQuantity}
-          onAddToCart={addToCart}
-          onDecrease={decreaseCart}
-          onNavigate={navigate}
-        />
-      )}
-      {page.name === 'cart' && <CartPage cart={cart} onAdd={addToCart} onDecrease={decreaseCart} onNavigate={navigate} />}
-      {page.name === 'checkout' && <CheckoutPage cart={cart} onNavigate={navigate} />}
-      {page.name === 'payment' && <PaymentPage cart={cart} onNavigate={navigate} />}
-      {page.name === 'orders' && <OrdersPage onNavigate={navigate} />}
-      {page.name === 'order' && <OrderDetailPage orderId={page.orderId} />}
-      {page.name === 'profile' && <ProfilePage />}
-      {page.name === 'login' && <LoginPage onNavigate={navigate} />}
-      {page.name === 'support' && <SupportPage />}
-    </AppShell>
+    </>
   );
 }
 

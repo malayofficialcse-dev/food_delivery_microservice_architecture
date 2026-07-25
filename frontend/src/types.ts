@@ -47,6 +47,8 @@ export type Product = {
 export type CartLine = {
   productId: string;
   quantity: number;
+  customizationText?: string;
+  priceAddition?: number;
 };
 
 export type Order = {

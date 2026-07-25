@@ -14,6 +14,7 @@ import {
   Timer,
   TrendingUp,
   Zap,
+  Check,
 } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
 import { RestaurantCard } from '../components/RestaurantCard';
@@ -23,6 +24,7 @@ import type { Page } from '../types';
 type HomePageProps = {
   onAddToCart: (productId: string) => void;
   onNavigate: (page: Page) => void;
+  onSearch: (term: string) => void;
 };
 
 const HERO_SLIDES = [
@@ -62,11 +64,16 @@ const TRUST_STATS = [
   { icon: Zap, value: '5000+', label: 'Restaurants' },
 ];
 
-export function HomePage({ onAddToCart, onNavigate }: HomePageProps) {
-  const featured = products.filter((p) => p.bestseller).slice(0, 3);
+export function HomePage({ onAddToCart, onNavigate, onSearch }: HomePageProps) {
   const [activeSlide, setActiveSlide] = useState(0);
-  const [locationValue, setLocationValue] = useState('');
+  const [locationValue, setLocationValue] = useState('Microsoft City Center, Hyderabad');
   const [searchValue, setSearchValue] = useState('');
+
+  // Interactive filters
+  const [filterVeg, setFilterVeg] = useState(false);
+  const [filterRating, setFilterRating] = useState(false);
+  const [filterETA, setFilterETA] = useState(false);
+  const [filterFreeDelivery, setFilterFreeDelivery] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setActiveSlide((s) => (s + 1) % HERO_SLIDES.length), 4500);
@@ -74,6 +81,42 @@ export function HomePage({ onAddToCart, onNavigate }: HomePageProps) {
   }, []);
 
   const slide = HERO_SLIDES[activeSlide];
+
+  // Helper search trigger
+  const triggerSearch = (term: string) => {
+    onSearch(term);
+    onNavigate({ name: 'products' });
+  };
+
+  // Filter restaurants
+  let filteredRestaurants = restaurants;
+  if (filterVeg) {
+    filteredRestaurants = filteredRestaurants.filter((r) => {
+      const rProducts = products.filter((p) => p.restaurantId === r.id);
+      return rProducts.some((p) => p.vegetarian);
+    });
+  }
+  if (filterRating) {
+    filteredRestaurants = filteredRestaurants.filter((r) => r.rating >= 4.6);
+  }
+  if (filterETA) {
+    filteredRestaurants = filteredRestaurants.filter((r) => {
+      const minETA = parseInt(r.eta);
+      return minETA <= 22; // Pasta Foundry and Northstar Burgers
+    });
+  }
+  if (filterFreeDelivery) {
+    filteredRestaurants = filteredRestaurants.filter(
+      (r) => r.deliveryFee === 0 || r.offer.toLowerCase().includes('free')
+    );
+  }
+
+  // Filter bestsellers
+  let featured = products.filter((p) => p.bestseller);
+  if (filterVeg) {
+    featured = featured.filter((p) => p.vegetarian);
+  }
+  featured = featured.slice(0, 3);
 
   return (
     <div className="hp-root">
@@ -95,7 +138,13 @@ export function HomePage({ onAddToCart, onNavigate }: HomePageProps) {
           <p className="hp-hero-sub">{slide.subtitle}</p>
 
           {/* search strip */}
-          <div className="hp-search-strip">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              triggerSearch(searchValue);
+            }}
+            className="hp-search-strip"
+          >
             <div className="hp-search-loc">
               <MapPin size={18} className="hp-search-icon" />
               <input
@@ -115,14 +164,19 @@ export function HomePage({ onAddToCart, onNavigate }: HomePageProps) {
                 aria-label="Search food"
               />
             </div>
-            <button className="hp-search-btn" type="button">
+            <button className="hp-search-btn" type="submit">
               <Search size={17} /> Search
             </button>
-          </div>
+          </form>
 
           <div className="hp-hero-pills">
             {['Biryani', 'Pizza', 'Burger', 'Sushi', 'Desserts'].map((t) => (
-              <button key={t} className="hp-hero-pill" type="button">
+              <button
+                key={t}
+                className="hp-hero-pill"
+                type="button"
+                onClick={() => triggerSearch(t)}
+              >
                 {t}
               </button>
             ))}
@@ -166,7 +220,12 @@ export function HomePage({ onAddToCart, onNavigate }: HomePageProps) {
       {/* ─── SERVICE PROMOS ─────────────────────────────────────────────────── */}
       <section className="hp-promos">
         {servicePromos.map((promo, idx) => (
-          <article className={`hp-promo hp-promo-${idx}`} key={promo.title}>
+          <article
+            className={`hp-promo hp-promo-${idx}`}
+            key={promo.title}
+            onClick={() => triggerSearch(promo.title === 'Instamart' ? 'grocery' : promo.title)}
+            style={{ cursor: 'pointer' }}
+          >
             <img src={promo.image} alt={promo.title} />
             <div className="hp-promo-overlay">
               <span className="hp-promo-kicker">{promo.subtitle}</span>
@@ -194,7 +253,12 @@ export function HomePage({ onAddToCart, onNavigate }: HomePageProps) {
         </div>
         <div className="hp-categories">
           {foodOptions.map((opt) => (
-            <button className="hp-cat-card" key={opt.name} type="button">
+            <button
+              className="hp-cat-card"
+              key={opt.name}
+              type="button"
+              onClick={() => triggerSearch(opt.name)}
+            >
               <div className="hp-cat-img-wrap">
                 <img src={opt.image} alt={opt.name} />
               </div>
@@ -221,15 +285,72 @@ export function HomePage({ onAddToCart, onNavigate }: HomePageProps) {
             View all <ChevronRight size={16} />
           </button>
         </div>
-        <div className="hp-restaurant-grid">
-          {restaurants.slice(0, 4).map((r) => (
-            <RestaurantCard
-              key={r.id}
-              restaurant={r}
-              onOpen={(id) => onNavigate({ name: 'restaurant', restaurantId: id })}
-            />
-          ))}
+
+        {/* Filter Buttons */}
+        <div className="hp-filters-row">
+          <button
+            type="button"
+            className={`hp-filter-pill ${filterVeg ? 'active' : ''}`}
+            onClick={() => setFilterVeg(!filterVeg)}
+          >
+            {filterVeg && <Check size={12} />}
+            🌿 Pure Veg
+          </button>
+          <button
+            type="button"
+            className={`hp-filter-pill ${filterRating ? 'active' : ''}`}
+            onClick={() => setFilterRating(!filterRating)}
+          >
+            {filterRating && <Check size={12} />}
+            ⭐ Rating 4.6+
+          </button>
+          <button
+            type="button"
+            className={`hp-filter-pill ${filterETA ? 'active' : ''}`}
+            onClick={() => setFilterETA(!filterETA)}
+          >
+            {filterETA && <Check size={12} />}
+            ⏱️ Fast Delivery (≤ 22m)
+          </button>
+          <button
+            type="button"
+            className={`hp-filter-pill ${filterFreeDelivery ? 'active' : ''}`}
+            onClick={() => setFilterFreeDelivery(!filterFreeDelivery)}
+          >
+            {filterFreeDelivery && <Check size={12} />}
+            🚚 Free Delivery
+          </button>
         </div>
+
+        {filteredRestaurants.length > 0 ? (
+          <div className="hp-restaurant-grid">
+            {filteredRestaurants.slice(0, 4).map((r) => (
+              <RestaurantCard
+                key={r.id}
+                restaurant={r}
+                onOpen={(id) => onNavigate({ name: 'restaurant', restaurantId: id })}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="hp-no-results-panel">
+            <span className="hp-no-results-emoji">🍽️</span>
+            <h3>No restaurants match your filters</h3>
+            <p>Try resetting some filters to see available partner restaurants.</p>
+            <button
+              className="hp-reset-filters-btn"
+              type="button"
+              onClick={() => {
+                setFilterVeg(false);
+                setFilterRating(false);
+                setFilterETA(false);
+                setFilterFreeDelivery(false);
+              }}
+            >
+              Reset filters
+            </button>
+          </div>
+        )}
       </section>
 
       {/* ─── BESTSELLERS ─────────────────────────────────────────────────────── */}
@@ -253,20 +374,30 @@ export function HomePage({ onAddToCart, onNavigate }: HomePageProps) {
             </span>
           </div>
         </div>
-        <div className="hp-product-grid">
-          {featured.map((product) => {
-            const restaurant = restaurants.find((r) => r.id === product.restaurantId);
-            return (
-              <ProductCard
-                key={product.id}
-                product={product}
-                restaurantName={restaurant?.name ?? 'Restaurant'}
-                onAdd={onAddToCart}
-                onOpen={(id) => onNavigate({ name: 'product', productId: id })}
-              />
-            );
-          })}
-        </div>
+        
+        {featured.length > 0 ? (
+          <div className="hp-product-grid">
+            {featured.map((product) => {
+              const restaurant = restaurants.find((r) => r.id === product.restaurantId);
+              return (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  restaurantName={restaurant?.name ?? 'Restaurant'}
+                  onAdd={onAddToCart}
+                  onOpen={(id) => onNavigate({ name: 'product', productId: id })}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <div className="hp-no-results-panel">
+            <span className="hp-no-results-emoji">🥗</span>
+            <h3>No bestseller items match</h3>
+            <p>Try toggling the "Pure Veg" filter off to see other bestsellers.</p>
+          </div>
+        )}
+
         <div className="hp-view-products-wrap">
           <button
             className="hp-view-products-btn"
@@ -286,7 +417,7 @@ export function HomePage({ onAddToCart, onNavigate }: HomePageProps) {
           </span>
           <h2 className="hp-offer-title">Get your first order 40% off</h2>
           <p>Use code <strong>WELCOME40</strong> at checkout. Valid on orders above $15.</p>
-          <button className="hp-offer-btn" type="button">
+          <button className="hp-offer-btn" type="button" onClick={() => onNavigate({ name: 'products' })}>
             Claim offer <ArrowRight size={16} />
           </button>
         </div>
