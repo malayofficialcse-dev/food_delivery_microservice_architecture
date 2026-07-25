@@ -1,4 +1,4 @@
-import { Plus, Star } from 'lucide-react';
+import { Flame, Plus, Star } from 'lucide-react';
 import { currency } from '../data/appData';
 import type { Product } from '../types';
 
@@ -11,24 +11,38 @@ type ProductCardProps = {
 
 export function ProductCard({ product, restaurantName, onAdd, onOpen }: ProductCardProps) {
   return (
-    <article className="product-card">
-      <button className="product-image-button" type="button" onClick={() => onOpen(product.id)}>
-        <img src={product.image} alt={product.name} />
+    <article className="pcard">
+      <button className="pcard-img-btn" type="button" onClick={() => onOpen(product.id)}>
+        <img src={product.image} alt={product.name} className="pcard-img" />
+        {product.bestseller && (
+          <span className="pcard-bestseller-badge">
+            <Flame size={12} /> Bestseller
+          </span>
+        )}
+        {product.vegetarian && <span className="pcard-veg-dot" title="Vegetarian" />}
       </button>
-      <div className="product-card-body">
-        <div className="card-title-row">
-          <button className="text-link" type="button" onClick={() => onOpen(product.id)}>{product.name}</button>
-          <strong>{currency.format(product.price)}</strong>
+
+      <div className="pcard-body">
+        <div className="pcard-top-row">
+          <div className="pcard-rating">
+            <Star size={12} fill="currentColor" /> {product.rating}
+          </div>
+          <span className="pcard-calories">{product.calories} cal</span>
         </div>
-        <p>{product.description}</p>
-        <div className="meta-row">
-          <span><Star size={14} /> {product.rating}</span>
-          <span>{restaurantName}</span>
-          {product.vegetarian ? <span>Veg</span> : null}
-        </div>
-        <button className="add-button" type="button" onClick={() => onAdd(product.id)}>
-          <Plus size={16} /> Add
+
+        <button className="pcard-name" type="button" onClick={() => onOpen(product.id)}>
+          {product.name}
         </button>
+        <p className="pcard-desc">{product.description}</p>
+
+        <div className="pcard-restaurant">{restaurantName}</div>
+
+        <div className="pcard-footer">
+          <span className="pcard-price">{currency.format(product.price)}</span>
+          <button className="pcard-add-btn" type="button" onClick={() => onAdd(product.id)}>
+            <Plus size={16} /> Add
+          </button>
+        </div>
       </div>
     </article>
   );

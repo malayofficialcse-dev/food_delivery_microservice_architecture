@@ -1,4 +1,4 @@
-import { Clock, MapPin, Star } from 'lucide-react';
+import { Clock, Flame, MapPin, Plus, ShieldCheck, Star, Tag, Utensils } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
 import { currency, products, restaurants } from '../data/appData';
 import type { Page } from '../types';
@@ -10,43 +10,61 @@ type RestaurantDetailPageProps = {
 };
 
 export function RestaurantDetailPage({ restaurantId, onAddToCart, onNavigate }: RestaurantDetailPageProps) {
-  const restaurant = restaurants.find((item) => item.id === restaurantId) ?? restaurants[0];
-  const menu = products.filter((product) => product.restaurantId === restaurant.id);
+  const restaurant = restaurants.find((r) => r.id === restaurantId) ?? restaurants[0];
+  const menu = products.filter((p) => p.restaurantId === restaurant.id);
 
   return (
-    <section className="page-stack">
-      <div className="restaurant-hero">
-        <img src={restaurant.image} alt={restaurant.name} />
-        <div className="restaurant-hero-copy">
-          <span className="section-kicker">{restaurant.cuisine}</span>
-          <h1>{restaurant.name}</h1>
-          <p>{restaurant.tags.join(' | ')}</p>
-          <div className="meta-row hero-meta">
-            <span><Star size={15} /> {restaurant.rating}</span>
+    <div className="rdp-root">
+      {/* Hero */}
+      <section className="rdp-hero">
+        <img src={restaurant.image} alt={restaurant.name} className="rdp-hero-img" />
+        <div className="rdp-hero-overlay" />
+        <div className="rdp-hero-content">
+          <span className="rdp-cuisine-tag">{restaurant.cuisine}</span>
+          <h1 className="rdp-name">{restaurant.name}</h1>
+          <div className="rdp-tags-row">
+            {restaurant.tags.map((t) => (
+              <span key={t} className="rdp-tag">{t}</span>
+            ))}
+          </div>
+          <div className="rdp-meta-row">
+            <span><Star size={15} fill="currentColor" /> {restaurant.rating}</span>
             <span><Clock size={15} /> {restaurant.eta}</span>
             <span><MapPin size={15} /> {restaurant.distance}</span>
             <span>{currency.format(restaurant.deliveryFee)} delivery</span>
           </div>
-          <span className="offer-strip">{restaurant.offer}</span>
+          <div className="rdp-offer-strip">
+            <Tag size={13} /> {restaurant.offer}
+          </div>
         </div>
+      </section>
+
+      {/* Trust strip */}
+      <div className="rdp-trust-strip">
+        <span><ShieldCheck size={14} /> Verified kitchen</span>
+        <span><Flame size={14} /> Live order tracking</span>
+        <span><Utensils size={14} /> Fresh ingredients</span>
+        <span><Plus size={14} /> {menu.length} items on menu</span>
       </div>
-      <div className="section-header">
-        <div>
-          <span className="section-kicker">Menu</span>
-          <h2>Recommended from this restaurant</h2>
+
+      {/* Menu */}
+      <section className="rdp-menu-section">
+        <div className="rdp-menu-head">
+          <span className="rdp-menu-tag">📋 Menu</span>
+          <h2 className="rdp-menu-title">Recommended from {restaurant.name}</h2>
         </div>
-      </div>
-      <div className="product-grid">
-        {menu.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            restaurantName={restaurant.name}
-            onAdd={onAddToCart}
-            onOpen={(productId) => onNavigate({ name: 'product', productId })}
-          />
-        ))}
-      </div>
-    </section>
+        <div className="rdp-product-grid">
+          {menu.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              restaurantName={restaurant.name}
+              onAdd={onAddToCart}
+              onOpen={(id) => onNavigate({ name: 'product', productId: id })}
+            />
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }
