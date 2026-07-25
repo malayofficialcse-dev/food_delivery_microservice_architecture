@@ -1,0 +1,10 @@
+import type { Request,Response } from "express";
+import { createOrderSchema,updateOrderSchema } from "../dto/index.dto";
+import * as service from "../services/order.service";
+const status=(message:string)=>message.includes("not found")?404:message.includes("no longer")?409:400;
+export const createOrder=async(req:Request,res:Response)=>{try{res.status(201).json({success:true,data:await service.createOrder(createOrderSchema.parse(req.body))});}catch(e){const message=(e as Error).message;res.status(status(message)).json({success:false,message});}};
+export const getOrders=async(req:Request,res:Response)=>{try{const data=await service.getOrders(typeof req.query.userId === "string"?req.query.userId:undefined);res.json({success:true,count:data.length,data});}catch(e){res.status(500).json({success:false,message:(e as Error).message});}};
+export const getOrder=async(req:Request,res:Response)=>{try{res.json({success:true,data:await service.getOrder(String(req.params.id))});}catch(e){res.status(404).json({success:false,message:(e as Error).message});}};
+export const updateOrder=async(req:Request,res:Response)=>{try{res.json({success:true,data:await service.updateOrder(String(req.params.id),updateOrderSchema.parse(req.body))});}catch(e){const message=(e as Error).message;res.status(status(message)).json({success:false,message});}};
+export const cancelOrder=async(req:Request,res:Response)=>{try{res.json({success:true,data:await service.cancelOrder(String(req.params.id))});}catch(e){const message=(e as Error).message;res.status(status(message)).json({success:false,message});}};
+export const updatePaymentStatus=async(req:Request,res:Response)=>{try{const body=updateOrderSchema.pick({paymentStatus:true}).parse(req.body);res.json({success:true,data:await service.updateOrder(String(req.params.id),body)});}catch(e){const message=(e as Error).message;res.status(status(message)).json({success:false,message});}};

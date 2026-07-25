@@ -1,19 +1,18 @@
 import {Pool} from "pg";
 import {env} from "./env";
-import { ConnectionTimeoutError } from "redis";
 
 
 export const pool = new Pool(
     {
         host :env.DB_HOST,
-        port:env.PORT,
+        port:env.DB_PORT,
         database:env.DB_NAME,
         user:env.DB_USER,
         password:env.DB_PASSWORD,
 
         max:20,
         idleTimeoutMillis:30000,
-        ConnectionTimeoutMillis:5000,
+        connectionTimeoutMillis:5000,
 
     }
 );
