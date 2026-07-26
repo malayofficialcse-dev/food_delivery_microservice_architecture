@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import type ApiError from "./apiError.ts";
+import ApiError from "./apiError";
 
 export const errorHandler = (
     err: Error | ApiError,

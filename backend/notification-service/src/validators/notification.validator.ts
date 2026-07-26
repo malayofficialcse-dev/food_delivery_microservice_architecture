@@ -10,7 +10,7 @@ export const createNotificationSchema = z.object({
 	email: z.string().email().optional(),
 	phone: z.string().optional(),
 	deviceToken: z.string().optional(),
-	metadata: z.record(z.any()).optional(),
+	metadata: z.record(z.string(), z.any()).optional(),
 });
 
 export const updateNotificationSchema = z.object({
@@ -21,7 +21,7 @@ export const updateNotificationSchema = z.object({
 	phone: z.string().optional(),
 	deviceToken: z.string().optional(),
 	status: z.nativeEnum(NotificationStatus).optional(),
-	metadata: z.record(z.any()).optional(),
+	metadata: z.record(z.string(), z.any()).optional(),
 });
 
 export default { createNotificationSchema, updateNotificationSchema };

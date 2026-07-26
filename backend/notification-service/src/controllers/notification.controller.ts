@@ -28,7 +28,7 @@ export const getNotifications = async (req: Request, res: Response) => {
 
 export const getNotificationById = async (req: Request, res: Response) => {
 	try {
-		const notification = await notificationService.getNotificationById(req.params.id);
+        const notification = await notificationService.getNotificationById(String(req.params.id));
 		res.json({ success: true, data: notification });
 	} catch (error) {
 		res.status(404).json({ success: false, message: (error as Error).message });
@@ -39,7 +39,7 @@ export const getNotificationsByUser = async (req: Request, res: Response) => {
 	try {
 		const limit = req.query.limit ? Number(req.query.limit) : undefined;
 		const offset = req.query.offset ? Number(req.query.offset) : undefined;
-		const notifications = await notificationService.getNotificationsByUser(req.params.userId, { limit, offset });
+        const notifications = await notificationService.getNotificationsByUser(String(req.params.userId), { limit, offset });
 		res.json({ success: true, count: notifications.length, data: notifications });
 	} catch (error) {
 		res.status(500).json({ success: false, message: (error as Error).message });
@@ -49,7 +49,7 @@ export const getNotificationsByUser = async (req: Request, res: Response) => {
 export const updateNotification = async (req: Request, res: Response) => {
 	try {
 		const payload = updateNotificationSchema.parse(req.body);
-		const notification = await notificationService.updateNotification(req.params.id, payload);
+        const notification = await notificationService.updateNotification(String(req.params.id), payload);
 		res.json({ success: true, data: notification });
 	} catch (error) {
 		res.status(400).json({ success: false, message: (error as Error).message });
@@ -59,7 +59,7 @@ export const updateNotification = async (req: Request, res: Response) => {
 export const setStatus = async (req: Request, res: Response) => {
 	try {
 		const body = z.object({ status: z.string() }).parse(req.body);
-		const notification = await notificationService.setStatus(req.params.id, body.status as any);
+        const notification = await notificationService.setStatus(String(req.params.id), body.status as any);
 		res.json({ success: true, data: notification });
 	} catch (error) {
 		res.status(400).json({ success: false, message: (error as Error).message });
@@ -68,7 +68,7 @@ export const setStatus = async (req: Request, res: Response) => {
 
 export const deleteNotification = async (req: Request, res: Response) => {
 	try {
-		await notificationService.deleteNotification(req.params.id);
+        await notificationService.deleteNotification(String(req.params.id));
 		res.json({ success: true, message: "Notification deleted successfully." });
 	} catch (error) {
 		res.status(400).json({ success: false, message: (error as Error).message });

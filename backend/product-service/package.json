@@ -6,12 +6,12 @@
   "scripts": {
     "dev": "nodemon",
     "build": "tsc",
-    "start": "node src/server.js"
+    "start": "node dist/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
+  "type": "commonjs",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "compression": "^1.8.1",

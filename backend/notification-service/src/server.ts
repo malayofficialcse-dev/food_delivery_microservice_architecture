@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 5007;
 const startServer = async () : Promise<void> => {
     try {
         //connect to db
-        await connectDB;
+        await connectDB();
 
         //connect to redis
         await connectRedis();

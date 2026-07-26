@@ -78,7 +78,7 @@ export const createUser = async (
 
             success: true,
 
-            data: user
+            data: { ...user, password: undefined }
 
         });
 
@@ -111,7 +111,7 @@ export const getAllUsers = async (
 
         count: users.length,
 
-        data: users
+        data: users.map(({ password: _password, ...user }) => user)
 
     });
 
@@ -143,7 +143,7 @@ export const getUserById = async (
 
         success: true,
 
-        data: user
+        data: (({ password: _password, ...safeUser }) => safeUser)(user)
 
     });
 
@@ -169,7 +169,7 @@ export const updateUser = async (
 
         success: true,
 
-        data: user
+        data: (({ password: _password, ...safeUser }) => safeUser)(user)
 
     });
 

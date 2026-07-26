@@ -1,5 +1,5 @@
-import type axios from "axios";
-import type {ENV} from "../config/env.ts";
+import axios from "axios";
+import { ENV } from "../config/env";
 
 export const getUserById = async (userId:string) => {
     try {

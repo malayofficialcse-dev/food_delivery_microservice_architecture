@@ -1,10 +1,12 @@
 import mongoose from "mongoose";
-import {ENV} from "./env.ts";
+import { ENV } from "./env";
 
 export const connectDB = async ():Promise<void> => {
     try {
         const connection = await mongoose.connect(
-            ENV.MONGO_URI
+            ENV.MONGO_URI.startsWith("mongodb://") || ENV.MONGO_URI.startsWith("mongodb+srv://")
+                ? ENV.MONGO_URI
+                : `mongodb://${ENV.MONGO_URI}`
         );
         console.log(`
             ====================================

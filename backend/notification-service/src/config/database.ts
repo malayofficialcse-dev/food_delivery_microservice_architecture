@@ -6,7 +6,7 @@ dotenv.config();
 
 const connectDB = async ():Promise<void> => {
     try {
-        const mongoURI = process.env.MONGO_URL;
+        const mongoURI = process.env.MONGODB_URI || process.env.MONGO_URL || "mongodb://localhost:27017/notification-db";
 
         if(!mongoURI) {
             throw new Error("MONGO URI is not defined");

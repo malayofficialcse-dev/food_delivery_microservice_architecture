@@ -7,8 +7,13 @@ export const startOrderEventConsumer = async (): Promise<void> => {
   if (!env.KAFKA_BROKER) return;
   const kafka = new Kafka({ clientId:`${env.KAFKA_CLIENT_ID}-consumer`, brokers:[env.KAFKA_BROKER] });
   const consumer = kafka.consumer({ groupId:env.KAFKA_GROUP_ID });
-  await consumer.connect();
-  await consumer.subscribe({ topic:env.KAFKA_PAYMENT_TOPIC, fromBeginning:false });
+  try {
+    await consumer.connect();
+    await consumer.subscribe({ topic:env.KAFKA_PAYMENT_TOPIC, fromBeginning:false });
+  } catch (error) {
+    console.warn("Kafka consumer unavailable; order service will continue without payment events", (error as Error).message);
+    return;
+  }
   await consumer.run({ eachMessage: async ({ message }) => {
     if (!message.value) return;
     try {

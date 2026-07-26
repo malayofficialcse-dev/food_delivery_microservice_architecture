@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import type { SignOptions } from "jsonwebtoken";
 import { env } from "../config/env";
 import { IUser } from "../interfaces/User";
 
@@ -24,7 +25,7 @@ export const generateAccessToken = (
         },
         env.JWT_SECRET,
         {
-            expiresIn: env.JWT_EXPIRES
+            expiresIn: env.JWT_EXPIRES as SignOptions["expiresIn"]
         }
     );
 

@@ -1,5 +1,6 @@
 import * as notificationRepository from "../repositories/index.repository";
-import type { INotification, NotificationStatus } from "../interfaces/notification.interface";
+import { NotificationStatus } from "../interfaces/notification.interface";
+import type { INotification } from "../interfaces/notification.interface";
 import emailService from "./email.service";
 import smsService from "./sms.service";
 import pushService from "./push.service";
@@ -25,9 +26,9 @@ class NotificationService {
 			}
 
 			// mark as sent
-			await notificationRepository.setNotificationStatus(notification.id, NotificationStatus.SENT);
+            await notificationRepository.setNotificationStatus(String(notification._id), NotificationStatus.SENT);
 		} catch (err) {
-			await notificationRepository.setNotificationStatus(notification.id, NotificationStatus.FAILED);
+            await notificationRepository.setNotificationStatus(String(notification._id), NotificationStatus.FAILED);
 		}
 
 		return notification;

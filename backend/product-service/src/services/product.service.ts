@@ -1,6 +1,6 @@
 import slugify from "slugify";
-import * as productRepository from "../repository/product.repository.ts";
-import type { IProduct } from "../Interfaces/product.interface.ts";
+import * as productRepository from "../repository/product.repository";
+import type { IProduct } from "../Interfaces/product.interface";
 
 class ProductService {
     async createProduct(

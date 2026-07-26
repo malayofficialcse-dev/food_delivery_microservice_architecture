@@ -1,0 +1,10 @@
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import routes from "./routes/index.routes";
+const app = express();
+app.use(cors()); app.use(helmet()); app.use(express.json());
+app.get("/", (_req, res) => res.json({ success: true, service: "user-service" }));
+app.get("/health", (_req, res) => res.json({ success: true, service: "user-service" }));
+app.use("/api/users", routes);
+export default app;

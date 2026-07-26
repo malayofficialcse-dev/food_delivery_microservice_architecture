@@ -1,5 +1,5 @@
-import Product from "../Models/product.model.ts";
-import type { IProduct } from "../Interfaces/product.interface.ts";
+import Product from "../Models/product.model";
+import type { IProduct } from "../Interfaces/product.interface";
 
 export type ProductCreateInput = Omit<
     IProduct,

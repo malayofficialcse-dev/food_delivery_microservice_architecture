@@ -4,7 +4,7 @@ import helmet from "helmet";
 import compression from "compression";
 import morgan from "morgan";
 
-import productRoutes from "./routes/product.routes.ts";
+import productRoutes from "./Routes/product.routes";
 
 const app = express();
 

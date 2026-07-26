@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import service from "../services/product.service.ts";
+import service from "../services/product.service";
 
 export const createProduct = async (
     req: Request,
@@ -44,7 +44,7 @@ export const getProductsById = async (
     res: Response
 ): Promise<void> => {
     try {
-        const product = await service.getProductsById(req.params.id);
+        const product = await service.getProductsById(String(req.params.id));
 
         if (!product) {
             res.status(404).json({
@@ -71,7 +71,7 @@ export const updateProduct = async (
     res: Response
 ): Promise<void> => {
     try {
-        const product = await service.updateProduct(req.params.id, req.body);
+        const product = await service.updateProduct(String(req.params.id), req.body);
 
         if (!product) {
             res.status(404).json({
@@ -99,7 +99,7 @@ export const deleteProduct = async (
     res: Response
 ): Promise<void> => {
     try {
-        await service.deleteProduct(req.params.id);
+        await service.deleteProduct(String(req.params.id));
 
         res.status(200).json({
             success: true,

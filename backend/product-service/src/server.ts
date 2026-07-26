@@ -2,9 +2,9 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-import app from "./app.ts";
-import { connectDB } from "./config/database.ts";
-import { ENV } from "./config/env.ts";
+import app from "./app";
+import { connectDB } from "./config/database";
+import { ENV } from "./config/env";
 
 const PORT = ENV.PORT || 5003;
 

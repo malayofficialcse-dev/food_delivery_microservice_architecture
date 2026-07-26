@@ -1,5 +1,5 @@
 import mongoose,{Schema} from "mongoose";
-import type { IProduct } from "../Interfaces/product.interface.ts";
+import type { IProduct } from "../Interfaces/product.interface";
 
 const ProductSchema = new Schema <IProduct> (
     {

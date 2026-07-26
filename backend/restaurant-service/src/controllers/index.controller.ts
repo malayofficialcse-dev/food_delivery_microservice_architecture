@@ -43,7 +43,7 @@ export const getRestaurants = async (req: Request, res: Response) => {
 
 export const getRestaurantById = async (req: Request, res: Response) => {
   try {
-    const restaurant = await restaurantService.getRestaurantById(req.params.id);
+    const restaurant = await restaurantService.getRestaurantById(String(req.params.id));
     res.json({
       success: true,
       data: restaurant,
@@ -59,7 +59,7 @@ export const getRestaurantById = async (req: Request, res: Response) => {
 export const updateRestaurant = async (req: Request, res: Response) => {
   try {
     const payload = restaurantUpdateSchema.parse(req.body);
-    const restaurant = await restaurantService.updateRestaurant(req.params.id, payload);
+    const restaurant = await restaurantService.updateRestaurant(String(req.params.id), payload);
 
     res.json({
       success: true,
@@ -75,7 +75,7 @@ export const updateRestaurant = async (req: Request, res: Response) => {
 
 export const deleteRestaurant = async (req: Request, res: Response) => {
   try {
-    await restaurantService.deleteRestaurant(req.params.id);
+    await restaurantService.deleteRestaurant(String(req.params.id));
     res.json({
       success: true,
       message: "Restaurant deleted successfully.",

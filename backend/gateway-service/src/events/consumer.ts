@@ -9,8 +9,13 @@ const kafka = new Kafka({
 const consumer = kafka.consumer({ groupId: "gateway-service-group" });
 
 export const createKafkaConsumer = async () => {
-  await consumer.connect();
-  await consumer.subscribe({ topic: "notification.send", fromBeginning: true });
+  try {
+    await consumer.connect();
+    await consumer.subscribe({ topic: "notification.send", fromBeginning: true });
+  } catch (error) {
+    console.warn("Kafka consumer unavailable; gateway will continue without events", (error as Error).message);
+    return;
+  }
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
