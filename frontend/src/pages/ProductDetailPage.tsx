@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, Flame, Minus, Plus, ShieldCheck, Star, Tag, ChefHat } from 'lucide-react';
-import { currency, products, restaurants } from '../data/appData';
-import type { Page } from '../types';
+import { currency, restaurants } from '../data/appData';
+import type { Page, Product } from '../types';
 
 type ProductDetailPageProps = {
   productId: string;
@@ -9,6 +9,7 @@ type ProductDetailPageProps = {
   onAddToCart: (productId: string, customizationText?: string, priceAddition?: number, qtyToAdd?: number) => void;
   onDecrease: (productId: string, customizationText?: string) => void;
   onNavigate: (page: Page) => void;
+  products: Product[];
 };
 
 function getCustomizationOptions(category: string) {
@@ -60,6 +61,7 @@ export function ProductDetailPage({
   productId,
   onAddToCart,
   onNavigate,
+  products,
 }: ProductDetailPageProps) {
   const product = products.find((p) => p.id === productId) ?? products[0];
   const restaurant = restaurants.find((r) => r.id === product.restaurantId) ?? restaurants[0];

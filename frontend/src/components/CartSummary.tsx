@@ -1,16 +1,17 @@
 import { ArrowRight, BadgePercent } from 'lucide-react';
-import { currency, products } from '../data/appData';
+import { currency } from '../data/appData';
 import { getCartSubtotal } from '../utils/cart';
-import type { CartLine, Page } from '../types';
+import type { CartLine, Page, Product } from '../types';
 
 type CartSummaryProps = {
   cart: CartLine[];
   buttonLabel: string;
   onNavigate: (page: Page) => void;
   target: Page;
+  products: Product[];
 };
 
-export function CartSummary({ cart, buttonLabel, onNavigate, target }: CartSummaryProps) {
+export function CartSummary({ cart, buttonLabel, onNavigate, target, products }: CartSummaryProps) {
   const subtotal = getCartSubtotal(cart, products);
   const delivery = cart.length ? 2.99 : 0;
   const taxes = subtotal * 0.08;

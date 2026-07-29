@@ -33,6 +33,7 @@ export type Restaurant = {
 export type Product = {
   id: string;
   restaurantId: string;
+  restaurantName?: string;
   name: string;
   category: string;
   description: string;

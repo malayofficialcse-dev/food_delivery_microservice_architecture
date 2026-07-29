@@ -1,15 +1,16 @@
 import { Clock, Flame, MapPin, Plus, ShieldCheck, Star, Tag, Utensils } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
-import { currency, products, restaurants } from '../data/appData';
-import type { Page } from '../types';
+import { currency, restaurants } from '../data/appData';
+import type { Page, Product } from '../types';
 
 type RestaurantDetailPageProps = {
   restaurantId: string;
   onAddToCart: (productId: string) => void;
   onNavigate: (page: Page) => void;
+  products: Product[];
 };
 
-export function RestaurantDetailPage({ restaurantId, onAddToCart, onNavigate }: RestaurantDetailPageProps) {
+export function RestaurantDetailPage({ restaurantId, onAddToCart, onNavigate, products }: RestaurantDetailPageProps) {
   const restaurant = restaurants.find((r) => r.id === restaurantId) ?? restaurants[0];
   const menu = products.filter((p) => p.restaurantId === restaurant.id);
 

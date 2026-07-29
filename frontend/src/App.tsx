@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { AppShell } from './components/AppShell';
-import { products } from './data/appData';
 import { CartPage } from './pages/CartPage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { HomePage } from './pages/HomePage';
@@ -14,8 +13,9 @@ import { ProfilePage } from './pages/ProfilePage';
 import { RestaurantDetailPage } from './pages/RestaurantDetailPage';
 import { RestaurantsPage } from './pages/RestaurantsPage';
 import { SupportPage } from './pages/SupportPage';
-import type { CartLine, Page, Theme } from './types';
+import type { CartLine, Page, Theme, Product } from './types';
 import { getCartCount } from './utils/cart';
+import { fetchProducts } from './services/productService';
 
 function App() {
   const [theme, setTheme] = useState<Theme>(() => {
@@ -24,15 +24,44 @@ function App() {
   });
   const [page, setPage] = useState<Page>({ name: 'home' });
   const [searchTerm, setSearchTerm] = useState('');
-  const [cart, setCart] = useState<CartLine[]>([
-    { productId: products[0].id, quantity: 1 },
-    { productId: products[2].id, quantity: 1 },
-  ]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [productsError, setProductsError] = useState<string | null>(null);
+  const [cart, setCart] = useState<CartLine[]>([]);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem('food-ui-theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadProducts = async () => {
+      try {
+        setProductsLoading(true);
+        setProductsError(null);
+        const data = await fetchProducts();
+        if (!cancelled) {
+          setProducts(data);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setProductsError(error instanceof Error ? error.message : 'Unable to load products');
+          setProducts([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setProductsLoading(false);
+        }
+      }
+    };
+
+    loadProducts();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const [toast, setToast] = useState<{ message: string; id: number } | null>(null);
 
@@ -101,13 +130,34 @@ function App() {
         onToggleTheme={() => setTheme(theme === 'light' ? 'dark' : 'light')}
         theme={theme}
       >
-        {page.name === 'home' && <HomePage onAddToCart={addToCart} onNavigate={navigate} onSearch={setSearchTerm} />}
+        {page.name === 'home' && (
+          <HomePage
+            onAddToCart={addToCart}
+            onNavigate={navigate}
+            onSearch={setSearchTerm}
+            products={products}
+            loading={productsLoading}
+            error={productsError}
+          />
+        )}
         {page.name === 'restaurants' && <RestaurantsPage onNavigate={navigate} />}
         {page.name === 'restaurant' && (
-          <RestaurantDetailPage restaurantId={page.restaurantId} onAddToCart={addToCart} onNavigate={navigate} />
+          <RestaurantDetailPage
+            restaurantId={page.restaurantId}
+            onAddToCart={addToCart}
+            onNavigate={navigate}
+            products={products}
+          />
         )}
         {page.name === 'products' && (
-          <ProductsPage searchTerm={searchTerm} onAddToCart={addToCart} onNavigate={navigate} />
+          <ProductsPage
+            searchTerm={searchTerm}
+            onAddToCart={addToCart}
+            onNavigate={navigate}
+            products={products}
+            loading={productsLoading}
+            error={productsError}
+          />
         )}
         {page.name === 'product' && (
           <ProductDetailPage
@@ -116,6 +166,7 @@ function App() {
             onAddToCart={addToCart}
             onDecrease={decreaseCart}
             onNavigate={navigate}
+            products={products}
           />
         )}
         {page.name === 'cart' && (
@@ -124,6 +175,7 @@ function App() {
             onAdd={(id, custText, priceAdd) => addToCart(id, custText, priceAdd, 1)}
             onDecrease={decreaseCart}
             onNavigate={navigate}
+            products={products}
           />
         )}
         {page.name === 'checkout' && <CheckoutPage cart={cart} onNavigate={navigate} />}

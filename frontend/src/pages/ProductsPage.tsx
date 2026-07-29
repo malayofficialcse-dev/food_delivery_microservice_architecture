@@ -1,18 +1,21 @@
 import { useState } from 'react';
 import { Flame, LayoutGrid, LayoutList, Search, SlidersHorizontal, Star, Zap } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
-import { categories, products, restaurants } from '../data/appData';
-import type { Page } from '../types';
+import { categories, restaurants } from '../data/appData';
+import type { Page, Product } from '../types';
 
 type ProductsPageProps = {
   searchTerm: string;
   onAddToCart: (productId: string) => void;
   onNavigate: (page: Page) => void;
+  products: Product[];
+  loading: boolean;
+  error: string | null;
 };
 
 const SORT_OPTIONS = ['Popular', 'Rating', 'Price: Low to High', 'Price: High to Low'];
 
-export function ProductsPage({ searchTerm, onAddToCart, onNavigate }: ProductsPageProps) {
+export function ProductsPage({ searchTerm, onAddToCart, onNavigate, products, loading, error }: ProductsPageProps) {
   const [activeCategory, setActiveCategory] = useState('All');
   const [activeSort, setActiveSort] = useState('Popular');
   const [gridView, setGridView] = useState(true);
@@ -131,7 +134,19 @@ export function ProductsPage({ searchTerm, onAddToCart, onNavigate }: ProductsPa
       </div>
 
       {/* ─── PRODUCT GRID ────────────────────────────────────────────────────── */}
-      {filteredProducts.length > 0 ? (
+      {loading ? (
+        <div className="pp-empty">
+          <div className="pp-empty-icon">⏳</div>
+          <h3>Loading products…</h3>
+          <p>Fetching the latest dishes from the backend.</p>
+        </div>
+      ) : error ? (
+        <div className="pp-empty">
+          <div className="pp-empty-icon">⚠️</div>
+          <h3>Unable to load products</h3>
+          <p>{error}</p>
+        </div>
+      ) : filteredProducts.length > 0 ? (
         <div className={gridView ? 'pp-grid' : 'pp-list'}>
           {filteredProducts.map((product) => {
             const restaurant = restaurants.find((r) => r.id === product.restaurantId);

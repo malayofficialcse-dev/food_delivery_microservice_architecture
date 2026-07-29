@@ -18,13 +18,16 @@ import {
 } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
 import { RestaurantCard } from '../components/RestaurantCard';
-import { foodOptions, products, restaurants, servicePromos } from '../data/appData';
-import type { Page } from '../types';
+import { foodOptions, restaurants, servicePromos } from '../data/appData';
+import type { Page, Product } from '../types';
 
 type HomePageProps = {
   onAddToCart: (productId: string) => void;
   onNavigate: (page: Page) => void;
   onSearch: (term: string) => void;
+  products: Product[];
+  loading: boolean;
+  error: string | null;
 };
 
 const HERO_SLIDES = [
@@ -64,7 +67,7 @@ const TRUST_STATS = [
   { icon: Zap, value: '5000+', label: 'Restaurants' },
 ];
 
-export function HomePage({ onAddToCart, onNavigate, onSearch }: HomePageProps) {
+export function HomePage({ onAddToCart, onNavigate, onSearch, products, loading, error }: HomePageProps) {
   const [activeSlide, setActiveSlide] = useState(0);
   const [locationValue, setLocationValue] = useState('Microsoft City Center, Hyderabad');
   const [searchValue, setSearchValue] = useState('');
@@ -375,7 +378,19 @@ export function HomePage({ onAddToCart, onNavigate, onSearch }: HomePageProps) {
           </div>
         </div>
         
-        {featured.length > 0 ? (
+        {loading ? (
+          <div className="hp-no-results-panel">
+            <span className="hp-no-results-emoji">⏳</span>
+            <h3>Loading menu items…</h3>
+            <p>Fetching fresh dishes from the backend product service.</p>
+          </div>
+        ) : error ? (
+          <div className="hp-no-results-panel">
+            <span className="hp-no-results-emoji">⚠️</span>
+            <h3>Unable to connect to the product service</h3>
+            <p>{error}</p>
+          </div>
+        ) : featured.length > 0 ? (
           <div className="hp-product-grid">
             {featured.map((product) => {
               const restaurant = restaurants.find((r) => r.id === product.restaurantId);

@@ -1,16 +1,17 @@
 import { ArrowRight, Minus, Plus, ShoppingBag, Tag, Trash2 } from 'lucide-react';
 import { CartSummary } from '../components/CartSummary';
-import { currency, products } from '../data/appData';
-import type { CartLine, Page } from '../types';
+import { currency } from '../data/appData';
+import type { CartLine, Page, Product } from '../types';
 
 type CartPageProps = {
   cart: CartLine[];
   onAdd: (productId: string, customizationText?: string, priceAddition?: number) => void;
   onDecrease: (productId: string, customizationText?: string) => void;
   onNavigate: (page: Page) => void;
+  products: Product[];
 };
 
-export function CartPage({ cart, onAdd, onDecrease, onNavigate }: CartPageProps) {
+export function CartPage({ cart, onAdd, onDecrease, onNavigate, products }: CartPageProps) {
   return (
     <div className="cart-root">
       {/* Page header */}
@@ -105,6 +106,7 @@ export function CartPage({ cart, onAdd, onDecrease, onNavigate }: CartPageProps)
           buttonLabel="Proceed to checkout"
           onNavigate={onNavigate}
           target={{ name: 'checkout' }}
+          products={products}
         />
       </div>
     </div>
